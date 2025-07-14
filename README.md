@@ -43,6 +43,8 @@ python Load_model.py -val_root [validation_data_path] -saved_model [target_domai
 for example:
 ```python
 python Load_model.py -val_root 'dataset_results/dataset_test/Hadrah_processed_20240222_test.csv' -saved_model 'saved_best_model/paper_model/Zone_SW22_HI24_Ours.pth'
+# or
+python Load_model.py -val_root 'dataset_results/dataset_test/Bimini_processed_20230301_test.csv' -saved_model 'saved_best_model/paper_model/Time_BI23_BI20_Ours.pth'
 ```
 ## Installation
 
