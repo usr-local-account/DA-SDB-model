@@ -113,9 +113,13 @@ This study conducted spatial and temporal transfer experiments, showing that the
 
 We recommend the following libraries for domain adaptation and transfer learning:
 
-1. **Transfer Learning Library (THUML)**: A comprehensive library for domain adaptation, task adaptation, and domain generalization with various state-of-the-art algorithms. [GitHub Repository](https://github.com/thuml/Transfer-Learning-Library)
+1. **Transfer Learning Library**: A comprehensive library for domain adaptation, task adaptation, and domain generalization with various state-of-the-art algorithms. [GitHub Repository](https://github.com/thuml/Transfer-Learning-Library)
 
 2. **DARE-GRAM**: Implementation of Domain Adaptation via Representation subspace Euclidean alignment using GRAM Matrices. [GitHub Repository](https://github.com/ismailnejjar/DARE-GRAM) 
+
+## Acknowledgements
+
+We would like to acknowledge that our implementation has been significantly influenced and assisted by the above-mentioned libraries. The domain adaptation techniques in our DA-SDB model draw inspiration from the Transfer Learning Library , while our Gram matrix alignment approach was informed by the DARE-GRAM implementation. These resources have been invaluable in developing our domain-adaptive bathymetry model. 
 
 ## License
 
