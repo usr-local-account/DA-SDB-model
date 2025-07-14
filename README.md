@@ -120,7 +120,3 @@ We recommend the following libraries for domain adaptation and transfer learning
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Contact
-
-For questions or collaborations, please contact: huanxie@tongji.edu.cn or cdliu@tongji.edu.cn
