@@ -35,7 +35,7 @@ This research utilizes the following data sources:
   - Hadrah Island (Southern Red Sea)
   - Mubarraz and Bu Tinah Islands (Persian Gulf)
 
-## reproduce the results
+## Reproduce results
 The easiest way to reproduce the results is to load the saved model:
 ```python
 # Test the model
