@@ -34,7 +34,16 @@ This research utilizes the following data sources:
   - South Warden Reef (Great Barrier Reef)
   - Hadrah Island (Southern Red Sea)
   - Mubarraz and Bu Tinah Islands (Persian Gulf)
-
+##
+The easiest way to reproduce the results is to load the saved model:
+```python
+# Test the model
+python Load_model.py -val_root [validation_data_path] -saved_model [target_domain_data_path] 
+```
+for example:
+```python
+python Load_model.py -val_root 'dataset_results/dataset_test/Hadrah_processed_20240222_test.csv' -saved_model 'saved_best_model/paper_model/Zone_SW22_HI24_Ours.pth'
+```
 ## Installation
 
 ### Requirements
@@ -64,7 +73,7 @@ python TransferDepthMain.py -train_source_root [source_domain_data_path] -train_
 
 ```python
 # Load trained model and evaluate
-python 0612_load_model.py
+python Load_model.py -val_root [validation_data_path] -saved_model [target_domain_data_path] 
 ```
 
 4. **Ablation Studies**
@@ -97,6 +106,13 @@ This study conducted spatial and temporal transfer experiments, showing that the
 - **Model Stability**: Achieved the best results in 11 out of 12 experiments, demonstrating excellent stability and generalization capabilities
 - **Depth Adaptability**: Maintained good accuracy across different depth ranges, particularly in regions where traditional methods perform poorly
 
+## Recommended Libraries
+
+We recommend the following libraries for domain adaptation and transfer learning:
+
+1. **Transfer Learning Library (THUML)**: A comprehensive library for domain adaptation, task adaptation, and domain generalization with various state-of-the-art algorithms. [GitHub Repository](https://github.com/thuml/Transfer-Learning-Library)
+
+2. **DARE-GRAM**: Implementation of Domain Adaptation via Representation subspace Euclidean alignment using GRAM Matrices. [GitHub Repository](https://github.com/ismailnejjar/DARE-GRAM) 
 
 ## License
 
