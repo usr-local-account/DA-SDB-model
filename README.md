@@ -1,20 +1,14 @@
 # DA-SDB-model
-# DA-SDB: Domain-Adaptive Satellite-Derived Bathymetry
+# DA-SDB: domain adaptation-based deep learning model for satellite-derived bathymetry
 
 [![Paper](https://img.shields.io/badge/Paper-ISPRS-blue)](https://www.isprs.org/)
 [![Dataset](https://img.shields.io/badge/Dataset-Sentinel--2-green)](https://sentinel.esa.int/web/sentinel/missions/sentinel-2)
 [![ICESat-2](https://img.shields.io/badge/ICESat--2-NASA-red)](https://icesat-2.gsfc.nasa.gov/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-<p align="center">
-  <img src="assets/model_structure.png" alt="DA-SDB Model Architecture" width="700"/>
-  <br>
-  <i>Architecture of the DA-SDB model, comprising three key components: feature extractor, bathymetry predictor, and domain aligner</i>
-</p>
-
 ## Introduction
 
-DA-SDB (Domain-Adaptive Satellite-Derived Bathymetry) is a deep learning model designed to address the generalization challenges in satellite-derived bathymetry (SDB) across spatial and temporal domains. Traditional empirical models exhibit limited transferability due to domain shifts caused by variations in water quality, substrate types, and atmospheric conditions. Our proposed DA-SDB model leverages domain adaptation techniques to significantly enhance generalization capability, providing an efficient and cost-effective solution for bathymetric mapping in remote areas and long-term monitoring of critical regions.
+DA-SDB (domain adaptation-based deep learning model for satellite-derived bathymetry) is a deep learning model designed to address the generalization challenges in satellite-derived bathymetry (SDB) across spatial and temporal domains. Traditional empirical models exhibit limited transferability due to domain shifts caused by variations in water quality, substrate types, and atmospheric conditions. Our proposed DA-SDB model leverages domain adaptation techniques to significantly enhance generalization capability, providing an efficient and cost-effective solution for bathymetric mapping in remote areas and long-term monitoring of critical regions.
 
 This research conducted extensive spatial and temporal transfer experiments across five diverse study areas (Dongsha Atoll, Bimini Island, South Warden Reef, Hadrah Island, and Mubarraz and Bu Tinah Islands), demonstrating the significant performance advantages of the DA-SDB model compared to existing methods, with stable performance in cross-regional and cross-temporal application scenarios.
 
@@ -88,43 +82,21 @@ python AlbrationMainpy.py
 | -train_target_root | Target domain training data path | - |
 | -val_root | Validation data path | - |
 | -input_features | Input feature dimensions | 14 |
-| -batch_size | Batch size | 64 |
-| -epochs | Total training epochs | 5 |
-| -domain_epochs | Domain adaptation training epochs | 50 |
+| -batch_size | Batch size | 1024 |
+| -epochs | Total training epochs | - |
+| -domain_epochs | Domain adaptation training epochs | 500 |
 | -hidden_dim | Hidden layer dimensions | 64 |
-| --trans_loss | Transfer loss function type | coral |
+| --trans_loss | Transfer loss function type | gram |
 
 ## Experimental Results
 
 This study conducted spatial and temporal transfer experiments, showing that the DA-SDB model achieved significant performance improvements compared to baseline methods (MBLA, RF, DNN):
 
-- **Spatial Transfer**: Achieved the best results in 5 out of 6 spatial transfer experiments, reducing average RMSE and MAPE by 0.27m and 21.51%, respectively
-- **Temporal Transfer**: Achieved the best results in 5 out of 6 temporal transfer experiments, with RMSE as low as 0.37m in clear waters and 0.86m in turbid waters
+- **Spatial Transfer**: Achieved the best results in 6 out of 6 spatial transfer experiments, reducing average RMSE and MAPE by 0.27m and 21.51%, respectively
+- **Temporal Transfer**: Achieved the best results in 5 out of 6 temporal transfer experiments, with RMSE as low as 0.37m in Bimini Island and 0.86m in Hadrah Island
 - **Model Stability**: Achieved the best results in 11 out of 12 experiments, demonstrating excellent stability and generalization capabilities
 - **Depth Adaptability**: Maintained good accuracy across different depth ranges, particularly in regions where traditional methods perform poorly
 
-## Implementation Details
-
-The repository includes:
-
-- Full implementation of the DA-SDB model with domain alignment and feature extraction modules
-- Sample input data and preprocessing scripts for handling remote sensing images and bathymetry data
-- Key model parameters and configurations for reproducing the best-performing results
-- Detailed documentation and step-by-step guides to navigate the codebase
-- Instructions for applying the DA-SDB model to new datasets
-
-## Citation
-
-If you use the DA-SDB model in your research, please cite our paper:
-
-```bibtex
-@article{liu2024generalized,
-  title={Generalized satellite-derived bathymetry across spatial and temporal domains: a domain-adaptive deep learning approach with multi-source remote sensing data},
-  author={Liu, Changda and Xie, Huan and Luan, Kuifeng and Xu, Qi and Sun, Yuan and Ji, Min and Tong, Xiaohua},
-  journal={ISPRS},
-  year={2024}
-}
-```
 
 ## License
 
@@ -132,4 +104,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Contact
 
-For questions or collaborations, please contact: huanxie@tongji.edu.cn 
+For questions or collaborations, please contact: huanxie@tongji.edu.cn or cdliu@tongji.edu.cn
