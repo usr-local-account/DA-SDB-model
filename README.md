@@ -120,6 +120,8 @@ We recommend the following libraries for domain adaptation and transfer learning
 
 We would like to acknowledge that our implementation has been significantly influenced and assisted by the above-mentioned libraries. The domain adaptation techniques in our DA-SDB model draw inspiration from the Transfer Learning Library , while our Gram matrix alignment approach was informed by the DARE-GRAM implementation. These resources have been invaluable in developing our domain-adaptive bathymetry model. 
 
+Note: Training datasets used in this work are currently under institutional review for public release. These will be made available immediately upon publication of the manuscript.
+
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
