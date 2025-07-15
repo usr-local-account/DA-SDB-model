@@ -94,8 +94,7 @@ python AlbrationMainpy.py
 | -val_root | Validation data path | - |
 | -input_features | Input feature dimensions | 14 |
 | -batch_size | Batch size | 1024 |
-| -epochs | Total training epochs | - |
-| -domain_epochs | Domain adaptation training epochs | 500 |
+| -epochs | Total training epochs | 500 |
 | -hidden_dim | Hidden layer dimensions | 64 |
 | --trans_loss | Transfer loss function type | gram |
 
