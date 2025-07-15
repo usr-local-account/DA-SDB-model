@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Mon Jul 14 23:53:09 2025
 
-@author: 长达
-"""
 import torch
 import torch.nn as nn
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
