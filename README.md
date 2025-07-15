@@ -1,7 +1,6 @@
 # DA-SDB-model
 # DA-SDB: domain adaptation-based deep learning model for satellite-derived bathymetry
 
-[![Paper](https://img.shields.io/badge/Paper-ISPRS-blue)](https://www.isprs.org/)
 [![Dataset](https://img.shields.io/badge/Dataset-Sentinel--2-green)](https://sentinel.esa.int/web/sentinel/missions/sentinel-2)
 [![ICESat-2](https://img.shields.io/badge/ICESat--2-NASA-red)](https://icesat-2.gsfc.nasa.gov/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
