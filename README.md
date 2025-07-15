@@ -1,10 +1,6 @@
 # DA-SDB-model
 # DA-SDB: domain adaptation-based deep learning model for satellite-derived bathymetry
 
-[![Dataset](https://img.shields.io/badge/Dataset-Sentinel--2-green)](https://sentinel.esa.int/web/sentinel/missions/sentinel-2)
-[![ICESat-2](https://img.shields.io/badge/ICESat--2-NASA-red)](https://icesat-2.gsfc.nasa.gov/)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
 ## Introduction
 
 DA-SDB (domain adaptation-based deep learning model for satellite-derived bathymetry) is a deep learning model designed to address the generalization challenges in satellite-derived bathymetry (SDB) across spatial and temporal domains. Traditional empirical models exhibit limited transferability due to domain shifts caused by variations in water quality, substrate types, and atmospheric conditions. Our proposed DA-SDB model leverages domain adaptation techniques to significantly enhance generalization capability, providing an efficient and cost-effective solution for bathymetric mapping in remote areas and long-term monitoring of critical regions.
