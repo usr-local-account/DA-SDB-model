@@ -4,6 +4,7 @@ from typing import List, Dict
 import torch.nn as nn
 import torch
 
+from gram_loss import DARE_GRAM_LOSS
 from tllib.modules.kernels import GaussianKernel
 from tllib.alignment.dan import MultipleKernelMaximumMeanDiscrepancy
 from tllib.alignment.jan import JointMultipleKernelMaximumMeanDiscrepancy
@@ -12,47 +13,7 @@ from tllib.alignment.dann import DomainAdversarialLoss
 from tllib.modules.domain_discriminator import DomainDiscriminator
 from tllib.modules.grl import WarmStartGradientReverseLayer
 
-# In[0] add
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-def DARE_GRAM_LOSS(H1, H2, treshold=0.9, tradeoff_angle=0.05, tradeoff_scale=0.001):    
-    b,p = H1.shape
-
-    A = torch.cat((torch.ones(b,1).to(device), H1), 1)
-    B = torch.cat((torch.ones(b,1).to(device), H2), 1)
-
-    cov_A = (A.t()@A)
-    cov_B = (B.t()@B) 
-
-    _,L_A,_ = torch.linalg.svd(cov_A)
-    _,L_B,_ = torch.linalg.svd(cov_B)
-    
-    eigen_A = torch.cumsum(L_A.detach(), dim=0)/L_A.sum()
-    eigen_B = torch.cumsum(L_B.detach(), dim=0)/L_B.sum()
-
-    if(eigen_A[1]>treshold):
-        T = eigen_A[1].detach()
-    else:
-        T = treshold
-        
-    index_A = torch.argwhere(eigen_A.detach()<=T)[-1]
-
-    if(eigen_B[1]>treshold):
-        T = eigen_B[1].detach()
-    else:
-        T = treshold
-
-    index_B = torch.argwhere(eigen_B.detach()<=T)[-1]
-    
-    k = max(index_A, index_B)[0]
-
-    A = torch.linalg.pinv(cov_A ,rtol = (L_A[k]/L_A[0]).detach())
-    B = torch.linalg.pinv(cov_B ,rtol = (L_B[k]/L_B[0]).detach())
-    
-    cos_sim = nn.CosineSimilarity(dim=0,eps=1e-6)
-    cos = torch.dist(torch.ones((p+1)).to(device),(cos_sim(A,B)),p=1)/(p+1)
-    return tradeoff_angle*(cos) + tradeoff_scale*torch.dist((L_A[:k]),(L_B[:k]))/k
-
-# In[0-] Create FullconnectBlock Model
+# In[0] Create FullconnectBlock Model
 class FullConnectBlock(nn.Module):
     def __init__(self, in_features, out_features, dropout_prob):
         super(FullConnectBlock, self).__init__()
@@ -84,7 +45,7 @@ class FullConnectBlock(nn.Module):
         output3 = self.dp3(output3)
         
         return output3
- # In[0+] Create FPyramidBlock Model
+ # In[0] Create FPyramidBlock Model
 class FPyramidBlock(nn.Module):
     def __init__(self, in_features, out_features, dropout_prob):
         super(FPyramidBlock, self).__init__()
