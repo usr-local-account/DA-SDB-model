@@ -82,7 +82,7 @@ python Load_model.py -val_root [validation_data_path] -saved_model [target_domai
 
 ```python
 # Conduct ablation experiments to verify the contribution of different modules
-python AlbrationMainpy.py
+python AlbrationMainpy.py -train_source_root [source_domain_data_path] -train_target_root [target_domain_data_path] -val_root [validation_data_path]
 ```
 
 ### Parameter Settings
