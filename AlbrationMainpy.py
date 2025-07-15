@@ -6,7 +6,6 @@ import argparse
 import numpy as np
 import torch.optim as optim
 from torch.utils.data import DataLoader
-import optuna
 
 import sys
 sys.path.append('..')
@@ -33,7 +32,7 @@ def save_validate(val_loader, model, device):
         ss_res = torch.sum((labels - outputs) ** 2)
         avg_r2 = 1 - (ss_res / ss_tot)
         
-    return mse, mae, mape, avg_r2, result_data
+    return mse, mae, mape, avg_r2
     
 # In[1] validate Function 
 def validate(val_loader, model, device):
@@ -127,57 +126,6 @@ def Main_train_Transfer(args):
         if stop >= args.early_stop:
             break
             
-# In[4] Optuna for HPO
-def objective(trial):
-    global best_loss
-    random.seed(SEED)
-    # Search on first
-    params_search = {
-        "batch_size": trial.suggest_categorical('batch_size', [256, 512, 1024]),
-        "lr": trial.suggest_loguniform('lr', 1e-4, 1e-1),
-        "dropout": trial.suggest_uniform('dropout', 0.1, 0.7),
-        "trade_off": trial.suggest_uniform('trade_off', 0.3, 30)
-            }
-    # Data loading code 
-    train_source_dataset = CustomDataset(csv_file=args.train_source_root, input_dim=args.input_features, use_slope=True)
-    train_source_loader = DataLoader(train_source_dataset, batch_size=params_search["batch_size"], shuffle=True, num_workers=args.workers, drop_last=True, pin_memory=True)
-    
-    train_target_dataset = CustomDataset(csv_file=args.train_target_root, input_dim=args.input_features, use_slope=True)
-    train_target_loader = DataLoader(train_target_dataset, batch_size=params_search["batch_size"], shuffle=True, num_workers=args.workers, drop_last=True, pin_memory=True)
-    
-    val_dataset = CustomDataset(csv_file=args.val_root, input_dim=args.input_features, use_slope=True)
-    val_loader = DataLoader(val_dataset, batch_size=len(val_dataset), shuffle=False, num_workers=args.workers, drop_last=True)
-    
-    train_source_iter = ForeverDataIterator(train_source_loader)
-    train_target_iter = ForeverDataIterator(train_target_loader)
-    min_length = min(len(train_source_dataset), len(train_target_dataset)) 
-    # Create model and optimazer
-    model = TransferNet(input_dims=args.input_features-1+6, hidden_dims=args.hidden_dim, 
-                        dropout_prob=params_search["dropout"],
-                        base_net=args.model, transfer_loss=args.trans_loss, use_bottleneck=False, 
-                        bottleneck_width=args.bottleneck_dim, width=args.regressor_dim).to(device)
-    optimizer = optim.Adam(model.parameters(), lr=params_search["lr"])
-
-    best_loss_local = float('inf')
-    stop = 0
-    iter_per_epochs = math.ceil(min_length / params_search["batch_size"]) 
-    for epoch in range(args.domain_epochs):
-        stop += 1
-        Loss, regress_loss, dann_loss = train_Transfer(train_source_iter, train_target_iter, 
-                                                           model, args.trans_loss, params_search["trade_off"], 
-                                                           iter_per_epochs, optimizer, device)
-        print(f'Epoch [{epoch + 1}/{args.domain_epochs}]-T_Loss:{Loss:.4f},R_loss:{regress_loss:.3f},D_loss:{dann_loss:.3f}')
-        avg_mse, avg_mae, avg_mape, avg_r2 = validate(val_loader, model, device)
-        print(f'Val_Loss(MSE):{avg_mse:.3f},Val_MAPE:{avg_mape:.3f},Val_R2:{avg_r2:.3f}')
-
-        if avg_mse < best_loss_local:
-            best_loss_local = avg_mse
-            stop = 0
-            if best_loss_local < best_loss:
-                best_loss = best_loss_local
-        if stop >= args.early_stop:
-            break
-    return best_loss_local
 # In[5] Parameters setting code 
 if __name__ == '__main__':
     SEED = 0
@@ -189,14 +137,11 @@ if __name__ == '__main__':
     torch.backends.cudnn.benchmark = False
     parser = argparse.ArgumentParser(description='Transfer Learning for Bathymetry Inversion')
     # Dataset Parameters Setting    
-    parser.add_argument('-train_source_root', metavar='DIR',default=r"D:\unity\TransferDepth\csv_data\Bimini-data-20230301.csv", help='root path of train_source_domain')
-    parser.add_argument('-train_target_root', metavar='DIR',default=r"D:\unity\TransferDepth\csv_data\GBR-all-groups-bands-compose-new.csv", help='root path of train_target_domain')
-    parser.add_argument('-val_root', metavar='DIR',default=r"D:\unity\TransferDepth\csv_data\GBR-all-groups-bands-compose-test2.csv", help='root path of val_domain')
-    parser.add_argument('-input_features', metavar='5',default=14, help='the input feature dims (default is 14).')
-    # HPO Parameters Setting    
-    parser.add_argument('-domain_epochs', default=80, type=int, metavar='N', help='number of total epochs to run')
-    # Training Parameters Setting
-    parser.add_argument('-iters_per_epoch', default=360, type=int, help='Number of iterations per epoch')
+    parser.add_argument('-train_source_root', metavar='DIR',default=r"your_path", help='root path of train_source_domain')
+    parser.add_argument('-train_target_root', metavar='DIR',default=r"your_path", help='root path of train_target_domain')
+    parser.add_argument('-val_root', metavar='DIR',default=r"your_path", help='root path of val_domain')
+    parser.add_argument('-input_features', metavar='5',default=14, help='the input feature dims (default is 14).')  
+    parser.add_argument('-domain_epochs', default=100, type=int, metavar='N', help='number of total epochs to run')
     parser.add_argument('-workers', default=0, type=int, metavar='N', help='number of data loading workers (default: 0)')
     # Transfer Parameters Setting
     parser.add_argument('--early_stop', type=int, default=20)
@@ -214,12 +159,7 @@ if __name__ == '__main__':
     parser.add_argument('--trade_off', default=7.2081020336712545, type=float,help='the trade-off hyper-parameter for transfer loss')
     parser.add_argument('--trans_loss', default='gram', help='the transfer loss function')
     args = parser.parse_args()    
-    # In[6] Train and Val using Optuna 
-#    best_loss = float('inf')
-#    study = optuna.create_study(direction='minimize')
-#    study.optimize(objective, n_trials=10) 
-#    best_params = study.best_params
-    # In[7] Loading the saved best model and saved the data and scatter mapping
+
     Main_train_Transfer(args)
     val_dataset = CustomDataset(csv_file=args.val_root, input_dim=args.input_features, use_slope=args.use_slope)
     val_loader = DataLoader(val_dataset, batch_size=len(val_dataset), shuffle=False, num_workers=0, drop_last=True)
@@ -229,7 +169,7 @@ if __name__ == '__main__':
                         base_net=args.model, transfer_loss=args.trans_loss, use_bottleneck=False, 
                         bottleneck_width=args.bottleneck_dim, width=args.regressor_dim).to(device) 
     model.load_state_dict(torch.load('best_AblationNet.pth'))
-    avg_mse, avg_mae, avg_mape, avg_r2, result_data = save_validate(val_loader, model, device)
+    avg_mse, avg_mae, avg_mape, avg_r2 = save_validate(val_loader, model, device)
     
     print(f'Loading the saved model:')
     print(f'Val_Loss(MSE):{avg_mse:.3f},Val_MAPE:{avg_mape:.3f},Val_R2:{avg_r2:.3f}')
