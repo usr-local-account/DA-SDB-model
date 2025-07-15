@@ -13,26 +13,9 @@ from CustomDataset import CustomDataset
 from TransferFPNmodel import TransferNet
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# In[0] validate Function
+# In[1] validate Function
 def save_validate(val_loader, model, device):
     # switch to evaluate mode
-    model.eval()
-    with torch.no_grad():
-        features, labels = next(iter(val_loader))
-        features = features.to(device).float()
-        labels = labels.to(device).float()
-        outputs = model.predict(features)
-        outputs = outputs.reshape(labels.shape)
-        mse = torch.nn.functional.mse_loss(outputs, labels, reduction='mean')
-        mae = torch.nn.functional.l1_loss(outputs, labels, reduction='mean')
-        mape = torch.mean(torch.abs((labels - outputs) / labels)) * 100
-        ss_tot = torch.sum((labels - torch.mean(labels)) ** 2)
-        ss_res = torch.sum((labels - outputs) ** 2)
-        avg_r2 = 1 - (ss_res / ss_tot)
-    return mse, mae, mape, avg_r2
-
-# In[1] validate Function 
-def validate(val_loader, model, device):
     model.eval()
     with torch.no_grad():
         features, labels = next(iter(val_loader))
