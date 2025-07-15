@@ -98,14 +98,6 @@ python AlbrationMainpy.py
 | -hidden_dim | Hidden layer dimensions | 64 |
 | --trans_loss | Transfer loss function type | gram |
 
-## Experimental Results
-
-This study conducted spatial and temporal transfer experiments, showing that the DA-SDB model achieved significant performance improvements compared to baseline methods (MBLA, RF, DNN):
-
-- **Spatial Transfer**: Achieved the best results in 6 out of 6 spatial transfer experiments, reducing average RMSE and MAPE by 0.27m and 21.51%, respectively
-- **Temporal Transfer**: Achieved the best results in 5 out of 6 temporal transfer experiments, with RMSE as low as 0.37m in Bimini Island and 0.86m in Hadrah Island
-- **Model Stability**: Achieved the best results in 11 out of 12 experiments, demonstrating excellent stability and generalization capabilities
-- **Depth Adaptability**: Maintained good accuracy across different depth ranges, particularly in regions where traditional methods perform poorly
 
 ## Recommended Libraries
 
