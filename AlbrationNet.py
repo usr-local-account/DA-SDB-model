@@ -281,7 +281,6 @@ class TransferNet(nn.Module):
             params, lr=args.lr, momentum=args.momentum, weight_decay=args.lr_decay)
         return optimizer
 
-# In[5] 创建消融实验相关的内容-消融Rrs_slope和金字塔架构 
 class AblationBlock(nn.Module):
     def __init__(self, input_Rrs_dims:int, out_features:int=64, dropout_prob:float=0.1):
         super(AblationBlock, self).__init__()
