@@ -13,48 +13,6 @@ from tllib.alignment.dann import DomainAdversarialLoss
 from tllib.modules.domain_discriminator import DomainDiscriminator
 from tllib.modules.grl import WarmStartGradientReverseLayer
 
-__all__ = ['RegressorFc']
-
-## In[0] add
-#device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-#def DARE_GRAM_LOSS(H1, H2, treshold=0.9, tradeoff_angle=0.05, tradeoff_scale=0.001):    
-#    b,p = H1.shape
-#
-#    A = torch.cat((torch.ones(b,1).to(device), H1), 1)
-#    B = torch.cat((torch.ones(b,1).to(device), H2), 1)
-#
-#    cov_A = (A.t()@A)
-#    cov_B = (B.t()@B) 
-#
-#    _,L_A,_ = torch.linalg.svd(cov_A)
-#    _,L_B,_ = torch.linalg.svd(cov_B)
-#    
-#    eigen_A = torch.cumsum(L_A.detach(), dim=0)/L_A.sum()
-#    eigen_B = torch.cumsum(L_B.detach(), dim=0)/L_B.sum()
-#
-#    if(eigen_A[1]>treshold):
-#        T = eigen_A[1].detach()
-#    else:
-#        T = treshold
-#        
-#    index_A = torch.argwhere(eigen_A.detach()<=T)[-1]
-#
-#    if(eigen_B[1]>treshold):
-#        T = eigen_B[1].detach()
-#    else:
-#        T = treshold
-#
-#    index_B = torch.argwhere(eigen_B.detach()<=T)[-1]
-#    
-#    k = max(index_A, index_B)[0]
-#
-#    A = torch.linalg.pinv(cov_A ,rtol = (L_A[k]/L_A[0]).detach())
-#    B = torch.linalg.pinv(cov_B ,rtol = (L_B[k]/L_B[0]).detach())
-#    
-#    cos_sim = nn.CosineSimilarity(dim=0,eps=1e-6)
-#    cos = torch.dist(torch.ones((p+1)).to(device),(cos_sim(A,B)),p=1)/(p+1)
-#    return tradeoff_angle*(cos) + tradeoff_scale*torch.dist((L_A[:k]),(L_B[:k]))/k
-
 # In[0] Create FullconnectBlock Model
 class FullConnectBlock(nn.Module):
     def __init__(self, in_features, out_features, dropout_prob):
@@ -87,7 +45,7 @@ class FullConnectBlock(nn.Module):
         output3 = self.dp3(output3)
         
         return output3
- # In[0+] Create FPyramidBlock Model 
+ # In[0] Create FPyramidBlock Model 
 class FPyramidBlock(nn.Module):
     def __init__(self, in_features, out_features, dropout_prob):
         super(FPyramidBlock, self).__init__()
@@ -130,7 +88,6 @@ class RegressorFPN(nn.Module):
         self.input_dims = input_dims 
         self.out_features = out_features 
         self.dropout_prob = dropout_prob
-        
         self.hidden_FPyramidBlock1 = nn.Sequential(FPyramidBlock(self.input_dims, self.out_features, self.dropout_prob))
         self.hidden_FPyramidBlock2 = nn.Sequential(FPyramidBlock(self.out_features*4, self.out_features, self.dropout_prob))
         self.hidden_FPyramidBlock3 = nn.Sequential(FPyramidBlock(self.out_features*4, self.out_features, self.dropout_prob))
@@ -138,7 +95,6 @@ class RegressorFPN(nn.Module):
     def forward(self, x: torch.Tensor):
         output1 = self.hidden_FPyramidBlock1(x)
         output2 = self.hidden_FPyramidBlock2(output1)
-        
         res_output2 = output1 + output2
         output3 = self.hidden_FPyramidBlock3(res_output2)
         return output3,res_output2
@@ -163,20 +119,16 @@ class FusionFeatureFPN(nn.Module):
         self.linear1 = nn.Linear(self.input_Rrsslope_dims, self.out_features*4)
         self.bn1 = nn.BatchNorm1d(self.out_features*4)
         self.dp1 = nn.Dropout(p=self.dropout_prob)
-        
         self.hidden_FPyramidBlock2 = nn.Sequential(FPyramidBlock(self.out_features*4*2, self.out_features, self.dropout_prob))
        
     def forward(self, x: torch.Tensor):
         x_spectral, x_slope = torch.split(x, [self.input_Rrs_dims-6, self.input_Rrsslope_dims], dim=1)
-        
         output1 = self.hidden_FPyramidBlock1(x_spectral)
         output_slope = self.linear1(x_slope)
         output_slope = torch.relu(self.bn1(output_slope))
         output_slope = self.dp1(output_slope)
-        
         shallow_output = output1 + output_slope 
         output2 = torch.cat((output1, output_slope), dim=1) 
-        
         output3 = self.hidden_FPyramidBlock2(output2)
         return output3, shallow_output
     
@@ -292,7 +244,6 @@ class RestNetBasicBlock(nn.Module):
         super(RestNetBasicBlock, self).__init__()
         self.in_features = in_features
         self.out_features = out_features
-        
         self.linear1 = nn.Linear(in_features, out_features)
         self.bn1 = nn.BatchNorm1d(out_features)
         self.linear2 = nn.Linear(out_features, out_features)
@@ -313,9 +264,8 @@ class RestNetBasicBlock(nn.Module):
 class RegressorFc(nn.Module):
     def __init__(self, input_dims: int, hidden_dims:int = 64):
         super(RegressorFc, self).__init__()
-        self.input_dims = input_dims #data's feature
-        self.hidden_dims = hidden_dims #every hidden layer dims，个人理解：由于resnet的存在，hidden layer的尺寸应该是一样的
-        
+        self.input_dims = input_dims 
+        self.hidden_dims = hidden_dims 
         self.input_layer = nn.Linear(self.input_dims, self.hidden_dims)
         self.bn_input = nn.BatchNorm1d(self.hidden_dims)
         self.hidden_layers1 = nn.Sequential(RestNetBasicBlock(self.hidden_dims, self.hidden_dims))
