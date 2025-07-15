@@ -196,4 +196,4 @@ if __name__ == '__main__':
     study.optimize(objective, n_trials=10) 
     best_params = study.best_params
     # In[7] Train and Val using Main_train_Transfer
-    Main_train_Transfer(args)
+    # Main_train_Transfer(args)
