@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from torch.utils.data import Dataset
 
-# In[0] Rrs_slope的归一化参数
+# In[0] max_min_params for spectral_slope
 # the default_params is Time_Bimini (for other unlist test)
 Time_Bimini = np.array([[-14.74468085, 40.38297872], [-12.42857143, 6.385714286],
                         [-17.20952381, 3.371428571], [-9.461538462, 20.04273504],
