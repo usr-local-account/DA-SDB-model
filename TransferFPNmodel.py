@@ -201,26 +201,7 @@ class TransferNet(nn.Module):
         return source, target
 
     def adapt_loss(self, X, Y, X_shallow, Y_shallow, adapt_loss, **kwargs):
-        if adapt_loss == 'dan':
-            mkmmd_loss = MultipleKernelMaximumMeanDiscrepancy(
-                kernels = [GaussianKernel(alpha=2 ** k) for k in range(-3, 2)],linear=False)
-            loss = mkmmd_loss(X, Y)
-        elif adapt_loss == 'coral':
-            CORAL = CorrelationAlignmentLoss()
-            loss = CORAL(X, Y)
-        elif adapt_loss == 'dann':
-            dann = DomainAdversarialLoss(self.domain_discri, reduction='mean')
-            loss = dann(X, Y)
-        elif adapt_loss == 'jan':
-            layer1_kernels = (GaussianKernel(alpha=0.5), GaussianKernel(1.), GaussianKernel(2.))
-            layer2_kernels = (GaussianKernel(1.), )
-            jan = JointMultipleKernelMaximumMeanDiscrepancy((layer1_kernels, layer2_kernels))
-            loss = jan((X_shallow, X), (Y_shallow, Y))
-        elif adapt_loss == 'adda':
-            grl = WarmStartGradientReverseLayer(alpha=1., lo=0., hi=2., max_iters=1000, auto_step=True)
-            domain_adv = DomainAdversarialLoss(self.domain_discri, grl=grl)
-            loss = domain_adv(X, Y)
-        elif adapt_loss == 'gram':
+        if adapt_loss == 'gram':
             loss = DARE_GRAM_LOSS(X, Y)
         else:
             loss = 0
