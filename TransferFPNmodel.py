@@ -155,9 +155,6 @@ class TransferNet(nn.Module):
         for i in range(2):
             self.regressor_layer[i * 3].weight.data.normal_(0, 0.01)
             self.regressor_layer[i * 3].bias.data.fill_(0.0)
-        if self.transfer_loss == 'dann' or self.transfer_loss == 'adda':
-            self.domain_discri = DomainDiscriminator(in_feature=self.hidden_dims*4, hidden_size=self.hidden_dims*4)
-            self.use_bottleneck = False
             
     def forward(self, source, target, source_label):               
         source, source_shallow = self.base_network(source)
