@@ -191,8 +191,6 @@ class TransferNet(nn.Module):
             {'params': self.bottleneck_layer.parameters(), 'lr': 10 * args.lr},
             {'params': self.regressor_layer.parameters(), 'lr': 10 * args.lr},
         ]
-        if self.transfer_loss == 'dann' or self.transfer_loss == 'adda':
-            params.append({'params': self.domain_discri.parameters(), 'lr': 10 * args.lr})
         optimizer = torch.optim.SGD(
             params, lr=args.lr, momentum=args.momentum, weight_decay=args.lr_decay)
         return optimizer
