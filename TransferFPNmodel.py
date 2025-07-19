@@ -187,18 +187,6 @@ class TransferNet(nn.Module):
         features,_ = self.base_network(x)
         regssior_results = self.regressor_layer(features)
         return regssior_results
-    
-    def plot_sne(self, source, target): 
-        source, source_shallow = self.base_network(source)
-        target, target_shallow = self.base_network(target)
-        source_reg = self.regressor_layer(source)
-        target_reg = self.regressor_layer(target)
-        if self.use_bottleneck:
-            source = self.bottleneck_layer(source)
-            target = self.bottleneck_layer(target)
-            source_shallow = self.bottleneck_layer(source_shallow)
-            target_shallow = self.bottleneck_layer(target_shallow) 
-        return source, target
 
     def adapt_loss(self, X, Y, X_shallow, Y_shallow, adapt_loss, **kwargs):
         if adapt_loss == 'gram':
