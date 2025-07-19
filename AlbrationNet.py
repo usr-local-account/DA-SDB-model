@@ -5,13 +5,6 @@ import torch.nn as nn
 import torch
 
 from gram_loss import DARE_GRAM_LOSS
-from tllib.modules.kernels import GaussianKernel
-from tllib.alignment.dan import MultipleKernelMaximumMeanDiscrepancy
-from tllib.alignment.jan import JointMultipleKernelMaximumMeanDiscrepancy
-from tllib.alignment.coral import CorrelationAlignmentLoss
-from tllib.alignment.dann import DomainAdversarialLoss
-from tllib.modules.domain_discriminator import DomainDiscriminator
-from tllib.modules.grl import WarmStartGradientReverseLayer
 
 # In[0] Create FullconnectBlock Model
 class FullConnectBlock(nn.Module):
@@ -168,9 +161,6 @@ class TransferNet(nn.Module):
         for i in range(2):
             self.regressor_layer[i * 3].weight.data.normal_(0, 0.01)
             self.regressor_layer[i * 3].bias.data.fill_(0.0)
-        if self.transfer_loss == 'dann' or self.transfer_loss == 'adda':
-            self.domain_discri = DomainDiscriminator(in_feature=self.hidden_dims*4, hidden_size=self.hidden_dims*4)
-            self.use_bottleneck = False
             
     def forward(self, source, target, source_label):       
         source, source_shallow = self.base_network(source)
@@ -193,38 +183,9 @@ class TransferNet(nn.Module):
         features,_ = self.base_network(x)
         regssior_results = self.regressor_layer(features)
         return regssior_results
-    
-    def plot_sne(self, source, target): 
-        source, source_shallow = self.base_network(source)
-        target, target_shallow = self.base_network(target)
-        if self.use_bottleneck:
-            source = self.bottleneck_layer(source)
-            target = self.bottleneck_layer(target)
-            source_shallow = self.bottleneck_layer(source_shallow)
-            target_shallow = self.bottleneck_layer(target_shallow) 
-        return source, target
 
     def adapt_loss(self, X, Y, X_shallow, Y_shallow, adapt_loss, **kwargs):
-        if adapt_loss == 'dan':
-            mkmmd_loss = MultipleKernelMaximumMeanDiscrepancy(
-                kernels = [GaussianKernel(alpha=2 ** k) for k in range(-3, 2)],linear=False)
-            loss = mkmmd_loss(X, Y)
-        elif adapt_loss == 'coral':
-            CORAL = CorrelationAlignmentLoss()
-            loss = CORAL(X, Y)
-        elif adapt_loss == 'dann':
-            dann = DomainAdversarialLoss(self.domain_discri, reduction='mean')
-            loss = dann(X, Y)
-        elif adapt_loss == 'jan':
-            layer1_kernels = (GaussianKernel(alpha=0.5), GaussianKernel(1.), GaussianKernel(2.))
-            layer2_kernels = (GaussianKernel(1.), )
-            jan = JointMultipleKernelMaximumMeanDiscrepancy((layer1_kernels, layer2_kernels))
-            loss = jan((X_shallow, X), (Y_shallow, Y))
-        elif adapt_loss == 'adda':
-            grl = WarmStartGradientReverseLayer(alpha=1., lo=0., hi=2., max_iters=1000, auto_step=True)
-            domain_adv = DomainAdversarialLoss(self.domain_discri, grl=grl)
-            loss = domain_adv(X, Y)
-        elif adapt_loss == 'gram':
+        if adapt_loss == 'gram':
             loss = DARE_GRAM_LOSS(X, Y)
         else:
             loss = 0
